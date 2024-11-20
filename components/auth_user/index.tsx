@@ -135,45 +135,6 @@ const Auth = () => {
               </Button>
             </div>
           </div>
-          <div className="w-full max-w-[25rem]">
-            <form onSubmit={onSubmit}>
-              <div className="flex justify-evenly flex-row">
-                <div className="flex flex-col items-center space-y-2">
-                  <Button
-                    type="submit"
-                    className="h-16 w-16"
-                    data-email={process.env.NEXT_PUBLIC_DEMO_USER_ALEX_EMAIL}
-                    onClick={handleButtonClick}
-                  >
-                   <IoPersonSharp size={22}/>
-                  </Button>
-                  <span className="text-sm">Alex Smith</span>
-                </div>
-                <div className="flex flex-col items-center space-y-2">
-                  <Button
-                    type="submit"
-                    className="h-16 w-16"
-                    data-email={process.env.NEXT_PUBLIC_DEMO_USER_TAYLOR_EMAIL}
-                    onClick={handleButtonClick}
-                  >
-                     <IoPersonSharp size={22}/>
-                  </Button>
-                  <span className="text-sm">Taylor Johnson</span>
-                </div>
-                <div className="flex flex-col items-center space-y-2">
-                  <Button
-                    type="submit"
-                    className="h-16 w-16"
-                    data-email={process.env.NEXT_PUBLIC_DEMO_USER_MORGAN_EMAIL}
-                    onClick={handleButtonClick}
-                  >
-                    <IoPersonSharp size={22}/>
-                  </Button>
-                  <span className="text-sm">Morgan Brown</span>
-                </div>
-              </div>
-            </form>
-          </div>
         </div>
       </div>
     </>
