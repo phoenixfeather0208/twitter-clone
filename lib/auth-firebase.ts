@@ -42,7 +42,6 @@ export const socialLogin = async (social: string) => {
   switch (social) {
     case "google":
       data = await signInWithGoogle();
+      return data;
   }
-
-  return data;
 };

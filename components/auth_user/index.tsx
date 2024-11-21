@@ -69,8 +69,7 @@ const Auth = () => {
   };
 
   const signInSocial = async (social: string) => {
-    const data: any = socialLogin(social);
-
+    const data: any = await socialLogin(social);
     if (data.success) {
       setRegisterStep(2);
       setRegisterData({ name: data.data.name, email: data.data.email });
