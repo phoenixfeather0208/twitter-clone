@@ -70,6 +70,7 @@ const Auth = () => {
 
   const signInSocial = async (social: string) => {
     const data: any = await socialLogin(social);
+
     if (data.success) {
       setRegisterStep(2);
       setRegisterData({ name: data.data.name, email: data.data.email });
@@ -103,12 +104,12 @@ const Auth = () => {
               </Button>
 
               <Button
-                onClick={() => signIn("github")}
+                onClick={() => signInSocial("twitter")}
                 size={"csize"}
                 className="gap-2"
               >
-                <FaGithub size={18} />
-                Sign up with Github
+                <FaXTwitter size={18} />
+                Sign up with X
               </Button>
 
               <div className="flex items-center justify-center">
