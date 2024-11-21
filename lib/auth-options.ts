@@ -1,8 +1,8 @@
-import { AuthOptions } from "next-auth";  
+import { AuthOptions } from "next-auth";
 import prisma from "@/lib/prismadb";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import GitHubProvider from "next-auth/providers/github";
-import GoogleProvider from "next-auth/providers/google";
+// import GitHubProvider from "next-auth/providers/github";
+// import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 
 export const authOptions: AuthOptions = {
@@ -24,18 +24,9 @@ export const authOptions: AuthOptions = {
         return user;
       },
     }),
-    GitHubProvider({
-      clientId: process.env.GITHUB_CLIENT_ID!,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
-    }),
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    }),
   ],
   callbacks: {
     async session({ session }: any) {
-    
       const isExistingUser = await prisma.user.findUnique({
         where: { email: session.user.email },
       });

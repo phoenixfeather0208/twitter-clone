@@ -14,10 +14,15 @@ import { Form } from "../ui/form";
 import axios from "axios";
 import { IoPersonSharp } from "react-icons/io5";
 
+import { socialLogin } from "@/lib/auth-firebase";
+
 const Auth = () => {
   const registerModal = useRegisterModal();
   const loginModal = useLoginModal();
   const [error, setError] = useState("");
+
+  const [registerStep, setRegisterStep] = useState(1);
+  const [registerData, setRegisterData] = useState({ name: "", email: "" });
 
   const onOpenRegisterModal = useCallback(() => {
     registerModal.onOpen();
@@ -63,9 +68,19 @@ const Auth = () => {
     event.currentTarget.setAttribute("data-submit", "true");
   };
 
+  const signInSocial = async (social: string) => {
+    const data: any = socialLogin(social);
+
+    if (data.success) {
+      setRegisterStep(2);
+      setRegisterData({ name: data.data.name, email: data.data.email });
+      registerModal.onOpen();
+    }
+  };
+
   return (
     <>
-      <RegisterModal />
+      <RegisterModal registerStep={registerStep} registerData={registerData} />
       <LoginModal />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center h-screen">
@@ -80,7 +95,7 @@ const Auth = () => {
             <h2 className="font-bold text-3xl mb-4">Join today.</h2>
             <div className="flex flex-col space-y-2">
               <Button
-                onClick={() => signIn("google")}
+                onClick={() => signInSocial("google")}
                 size={"csize"}
                 className="gap-2"
               >

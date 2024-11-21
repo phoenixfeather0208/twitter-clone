@@ -1,4 +1,10 @@
-import React, { Dispatch, SetStateAction, useCallback, useState } from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import Modal from "../ui/modal";
 import useRegisterModal from "@/components/modal/hooks/useRegisterModal";
 import useLoginModal from "@/components/modal/hooks/useLoginModal";
@@ -20,9 +26,19 @@ import { Button } from "../ui/button";
 import axios from "axios";
 import { signIn } from "next-auth/react";
 
-const RegisterModal = () => {
+interface RegisterType {
+  registerStep: number;
+  registerData: any;
+}
+
+const RegisterModal = (props: RegisterType) => {
   const [step, setStep] = useState(1);
   const [data, setData] = useState({ name: "", email: "" });
+
+  useEffect(() => {
+    setStep(props.registerStep);
+    setData(props.registerData);
+  }, [props.registerStep, props.registerData]);
 
   const loginModal = useLoginModal();
   const registerModal = useRegisterModal();
@@ -88,7 +104,6 @@ function RegisterStep1({
   async function onSubmit(values: z.infer<typeof registerStep1Schema>) {
     try {
       const { data } = await axios.post("/api/auth/register?step=1", values);
- 
 
       if (data.success) {
         setData(values);
@@ -121,7 +136,7 @@ function RegisterStep1({
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input placeholder="Name" {...field} autoComplete="off"/>
+                <Input placeholder="Name" {...field} autoComplete="off" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -133,7 +148,7 @@ function RegisterStep1({
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input placeholder="Email" {...field} autoComplete="off"/>
+                <Input placeholder="Email" {...field} autoComplete="off" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -147,7 +162,11 @@ function RegisterStep1({
   );
 }
 
-function RegisterStep2({ data }: { data: { name: string; email: string } }) {
+export function RegisterStep2({
+  data,
+}: {
+  data: { name: string; email: string };
+}) {
   const [error, setError] = useState("");
   const registerModal = useRegisterModal();
 
@@ -176,7 +195,6 @@ function RegisterStep2({ data }: { data: { name: string; email: string } }) {
         });
         registerModal.onClose();
       }
-      
     } catch (error: any) {
       if (error.response.data.error) {
         setError(error.response.data.error);
