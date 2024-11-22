@@ -9,20 +9,22 @@ import LoginModal from "../modal/login-modal";
 import useLoginModal from "@/components/modal/hooks/useLoginModal";
 import { signIn } from "next-auth/react";
 import { FaGithub } from "react-icons/fa";
-import { FaXTwitter } from "react-icons/fa6";
+import { FaApple, FaXTwitter } from "react-icons/fa6";
 import { Form } from "../ui/form";
 import axios from "axios";
 import { IoPersonSharp } from "react-icons/io5";
 
 import { socialLogin } from "@/lib/auth-firebase";
+import Modal from "@/components/elements/modal/modal";
 
 const Auth = () => {
   const registerModal = useRegisterModal();
   const loginModal = useLoginModal();
-  const [error, setError] = useState("");
+  const [error, setError] = useState(false);
 
   const [registerStep, setRegisterStep] = useState(1);
   const [registerData, setRegisterData] = useState({ name: "", email: "" });
+  const [errorMsg, setErrorMsg] = useState("");
 
   const onOpenRegisterModal = useCallback(() => {
     registerModal.onOpen();
@@ -75,11 +77,24 @@ const Auth = () => {
       setRegisterStep(2);
       setRegisterData({ name: data.data.name, email: data.data.email });
       registerModal.onOpen();
+    } else {
+      setError(true);
+      setErrorMsg(data.msg);
     }
   };
 
   return (
     <>
+      {error && (
+        <Modal
+          children={
+            <div className=" flex justify-center text-xl pt-2 text-red-500">
+              Error: {errorMsg}
+            </div>
+          }
+          onClose={() => setError(false)}
+        />
+      )}
       <RegisterModal registerStep={registerStep} registerData={registerData} />
       <LoginModal />
 
@@ -110,6 +125,15 @@ const Auth = () => {
               >
                 <FaXTwitter size={18} />
                 Sign up with X
+              </Button>
+
+              <Button
+                onClick={() => signInSocial("apple")}
+                size={"csize"}
+                className="gap-2"
+              >
+                <FaApple size={18} />
+                Sign up with Apple
               </Button>
 
               <div className="flex items-center justify-center">
