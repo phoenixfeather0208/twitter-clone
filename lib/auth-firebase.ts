@@ -12,7 +12,7 @@ const signInWithGoogle = async () => {
   const provider = new GoogleAuthProvider();
 
   const result = await signInWithPopup(auth, provider);
-  const user: any = result.user;
+  const user = result.user;
 
   try {
     if (!user.email) {
@@ -56,7 +56,7 @@ const signInWithTwitter = async () => {
   const provider = new TwitterAuthProvider();
 
   const result = await signInWithPopup(auth, provider);
-  const user: any = result.user;
+  const user = result.user;
 
   try {
     if (!user.email) {
@@ -91,6 +91,56 @@ const signInWithTwitter = async () => {
       return {
         success: false,
         msg: "Error signing in with X.",
+      };
+    }
+  }
+};
+
+const signInWithYahoo = async () => {
+  const provider = new OAuthProvider("yahoo.com");
+
+  // Add scopes if needed (e.g., email, profile)
+  provider.addScope("openid");
+  provider.addScope("profile");
+  provider.addScope("email");
+
+  // Trigger sign-in with a popup
+  const result = await signInWithPopup(auth, provider);
+  const user = result.user;
+
+  try {
+    if (!user.email) {
+      return {
+        success: false,
+        msg: "Please verify your email on Yahoo account.",
+      };
+    }
+
+    const step1_value = {
+      name: user.displayName,
+      email: user.email,
+    };
+
+    const data: any = await axios.post(
+      "/api/auth/register?step=1",
+      step1_value
+    );
+
+    if (data.data.success) {
+      return { success: true, data: step1_value };
+    }
+  } catch (error: any) {
+    if (error.status === 400) {
+      await signIn("credentials", {
+        email: user.email,
+        password: user.email,
+      });
+    } else {
+      //   console.error("Error signing in with Twitter:", error);
+      //   throw error;
+      return {
+        success: false,
+        msg: "Error signing in with Yahoo.",
       };
     }
   }
@@ -142,6 +192,9 @@ export const socialLogin = async (social: string) => {
       return data;
     case "twitter":
       data = await signInWithTwitter();
+      return data;
+    case "yahoo":
+      data = await signInWithYahoo();
       return data;
     case "apple":
       data = await signInWithApple();

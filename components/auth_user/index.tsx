@@ -9,7 +9,7 @@ import LoginModal from "../modal/login-modal";
 import useLoginModal from "@/components/modal/hooks/useLoginModal";
 import { signIn } from "next-auth/react";
 import { FaGithub } from "react-icons/fa";
-import { FaApple, FaXTwitter } from "react-icons/fa6";
+import { FaApple, FaXTwitter, FaYahoo } from "react-icons/fa6";
 import { Form } from "../ui/form";
 import axios from "axios";
 import { IoPersonSharp } from "react-icons/io5";
@@ -125,6 +125,15 @@ const Auth = () => {
               >
                 <FaXTwitter size={18} />
                 Sign up with X
+              </Button>
+
+              <Button
+                onClick={() => signInSocial("yahoo")}
+                size={"csize"}
+                className="gap-2"
+              >
+                <FaYahoo size={18} />
+                Sign up with Yahoo
               </Button>
 
               <Button
