@@ -193,6 +193,14 @@ export function RegisterStep2({
           email: data.email,
           password: values.password,
         });
+
+        axios.post("/api/sendmail", {
+          to: data.email,
+          subject: "Opinyx.com",
+          text: "Thanks for your registration to Opinyx.com",
+          html: `<p>Registration is done successfully.</p>`,
+        });
+
         registerModal.onClose();
       }
     } catch (error: any) {
