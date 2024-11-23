@@ -25,6 +25,7 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import axios from "axios";
 import { signIn } from "next-auth/react";
+import { compare } from "bcrypt";
 
 interface RegisterType {
   registerStep: number;
@@ -108,6 +109,8 @@ function RegisterStep1({
       if (data.success) {
         setData(values);
         setStep(2);
+        localStorage.setItem("email", values.email);
+        localStorage.setItem("name", values.name);
       }
     } catch (error: any) {
       if (error.response.data.error) {
@@ -178,30 +181,54 @@ export function RegisterStep2({
     },
   });
 
+  const getCookieValue = (cookieName: string) => {
+    const cookies = document.cookie.split("; ");
+    const cookie = cookies.find((row) => row.startsWith(`${cookieName}=`));
+    return cookie ? cookie.split("=")[1] : null;
+  };
+
   async function onSubmit(values: z.infer<typeof registerStep2Schema>) {
     try {
-      const { data: response, status } = await axios.post(
-        "/api/auth/register?step=2",
-        {
-          ...data,
-          ...values,
+      const email = localStorage.getItem("email");
+      const verify = decodeURIComponent(getCookieValue("verify") as string);
+      if (email && verify) {
+        const res: any = await axios.post(`/api/auth/verify/${email}`, {
+          email,
+          verify,
+        });
+
+        if (!res.data.isMatch) {
+          setError("Verify your email please.");
+        } else {
+          const { data: response, status } = await axios.post(
+            "/api/auth/register?step=2",
+            {
+              ...data,
+              ...values,
+            }
+          );
+
+          if (status === 200) {
+            signIn("credentials", {
+              email: data.email,
+              password: values.password,
+            });
+
+            axios.post("/api/auth/sendmail", {
+              to: data.email,
+              subject: "Opinyx.com",
+              text: "Thanks for your registration to Opinyx.com",
+              html: `<p>Registration is done successfully.</p>`,
+            });
+
+            localStorage.removeItem("name");
+            localStorage.removeItem("email");
+
+            registerModal.onClose();
+          }
         }
-      );
-
-      if (status === 200) {
-        signIn("credentials", {
-          email: data.email,
-          password: values.password,
-        });
-
-        axios.post("/api/sendmail", {
-          to: data.email,
-          subject: "Opinyx.com",
-          text: "Thanks for your registration to Opinyx.com",
-          html: `<p>Registration is done successfully.</p>`,
-        });
-
-        registerModal.onClose();
+      } else {
+        setError("Verify your email please");
       }
     } catch (error: any) {
       if (error.response.data.error) {

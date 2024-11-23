@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import ModeToggle from "../ui/modeToggle";
 import useRegisterModal from "@/components/modal/hooks/useRegisterModal";
@@ -25,6 +25,17 @@ const Auth = () => {
   const [registerStep, setRegisterStep] = useState(1);
   const [registerData, setRegisterData] = useState({ name: "", email: "" });
   const [errorMsg, setErrorMsg] = useState("");
+
+  useEffect(() => {
+    const email = localStorage.getItem("email") as string;
+    const name = localStorage.getItem("name") as string;
+    console.log(email, name);
+    if (email && name) {
+      setRegisterStep(2);
+      setRegisterData({ name, email });
+      registerModal.onOpen();
+    }
+  }, []);
 
   const onOpenRegisterModal = useCallback(() => {
     registerModal.onOpen();
