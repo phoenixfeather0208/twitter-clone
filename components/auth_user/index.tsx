@@ -29,7 +29,7 @@ const Auth = () => {
   useEffect(() => {
     const email = localStorage.getItem("email") as string;
     const name = localStorage.getItem("name") as string;
-    console.log(email, name);
+
     if (email && name) {
       setRegisterStep(2);
       setRegisterData({ name, email });

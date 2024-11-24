@@ -25,7 +25,6 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import axios from "axios";
 import { signIn } from "next-auth/react";
-import { compare } from "bcrypt";
 
 interface RegisterType {
   registerStep: number;
