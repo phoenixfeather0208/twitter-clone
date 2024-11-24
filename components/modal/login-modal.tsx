@@ -45,6 +45,7 @@ const LoginModal = () => {
 
   async function onSubmit(values: z.infer<typeof loginSchema>) {
     try {
+      values.email = values.email.toLowerCase();
       const { data } = await axios.post("/api/auth/login", values);
 
       if (data.success) {

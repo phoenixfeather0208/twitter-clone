@@ -103,6 +103,7 @@ function RegisterStep1({
 
   async function onSubmit(values: z.infer<typeof registerStep1Schema>) {
     try {
+      values.email = values.email.toLowerCase();
       const { data } = await axios.post("/api/auth/register?step=1", values);
 
       if (data.success) {
