@@ -73,7 +73,7 @@ const RegisterModal = (props: RegisterType) => {
     <Modal
       title="Create account"
       body={bodyContent}
-      footer={footer}
+      // footer={footer}
       isOpen={registerModal.isOpen}
       onClose={registerModal.onClose}
       step={step}
