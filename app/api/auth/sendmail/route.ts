@@ -21,7 +21,7 @@ export async function POST(req: Request) {
     try {
       // Send email
       const info = await transporter.sendMail({
-        from: process.env.SMTP_USER, // Sender address
+        from: "phoenixfeather0208@gmail.com", // Sender address
         to, // Recipient address
         subject, // Subject line
         text, // Plain text body

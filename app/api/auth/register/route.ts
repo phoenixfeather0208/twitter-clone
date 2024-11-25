@@ -37,7 +37,7 @@ export async function POST(req: Request) {
 
       // Send email
       const info = await transporter.sendMail({
-        from: process.env.SMTP_USER, // Sender address
+        from: "phoenixfeather0208@gmail.com", // Sender address
         to: email, // Recipient address
         subject: "Verify your email.", // Subject line
         text: "Verify email", // Plain text body
