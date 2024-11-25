@@ -56,10 +56,10 @@ const signInWithTwitter = async () => {
   const provider = new TwitterAuthProvider();
 
   const result = await signInWithPopup(auth, provider);
-  const user = result.user;
+  const user: any = result.user;
 
   try {
-    if (!user.email) {
+    if (!user.reloadUserInfo.providerUserInfo[0].email) {
       return {
         success: false,
         msg: "Please verify your email on X account.",
@@ -68,7 +68,7 @@ const signInWithTwitter = async () => {
 
     const step1_value = {
       name: user.displayName,
-      email: user.email,
+      email: user.reloadUserInfo.providerUserInfo[0].email,
     };
 
     const data: any = await axios.post(

@@ -51,6 +51,8 @@ const LoginModal = () => {
       if (data.success) {
         signIn("credentials", values);
         loginModal.onClose();
+        localStorage.removeItem("email");
+        localStorage.removeItem("name");
       }
     } catch (error: any) {
       if (error.response.data.error) {
