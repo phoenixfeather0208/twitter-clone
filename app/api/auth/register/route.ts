@@ -26,7 +26,7 @@ export async function POST(req: Request) {
       }
 
       const transporter = nodemailer.createTransport({
-        host: "smtp.mailersend.net", // For Gmail SMTP server
+        host: process.env.SMTP_SERVER, // For Gmail SMTP server
         port: 587, // For secure connection
         secure: false, // Use TLS
         auth: {
