@@ -283,7 +283,7 @@ export function RegisterStep2({
         <Button
           type="submit"
           size={"csize"}
-          disabled={isSubmitting}
+          // disabled={isSubmitting}
           className="gap-2"
         >
           Register
