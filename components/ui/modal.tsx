@@ -50,7 +50,8 @@ const Modal = ({
         <div className="flex items-center gap-6">
           {step && totalSteps && (
             <div className="">
-              Step {step} of {totalSteps}
+              Step {step} of {totalSteps}{" "}
+              {step == 2 && "(Check your inbox to verify email.)"}
             </div>
           )}
         </div>
