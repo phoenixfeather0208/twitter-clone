@@ -219,7 +219,8 @@ export function RegisterStep2({
           const { data: response, status } = await axios.post(
             "/api/auth/register?step=2",
             {
-              ...data,
+              email,
+              name,
               ...values,
             }
           );
