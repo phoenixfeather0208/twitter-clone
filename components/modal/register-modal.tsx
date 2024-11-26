@@ -115,7 +115,7 @@ function RegisterStep1({
       if (data.success) {
         setData(values);
         setStep(2);
-        sendSignInLinkToEmail(auth, values.email, {
+        await sendSignInLinkToEmail(auth, values.email, {
           url: process.env.NEXTAUTH_URL as string,
           handleCodeInApp: true,
         });
