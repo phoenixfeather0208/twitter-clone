@@ -27,8 +27,9 @@ const Auth = () => {
   const [errorMsg, setErrorMsg] = useState("");
 
   useEffect(() => {
-    const email = localStorage.getItem("email") as string;
-    const name = localStorage.getItem("name") as string;
+    const queryParams = new URLSearchParams(window.location.search);
+    const email = queryParams.get("email");
+    const name = queryParams.get("name");
 
     if (email && name) {
       setRegisterStep(2);

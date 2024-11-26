@@ -124,8 +124,14 @@ function RegisterStep1({
           values.email
         );
 
-        await sendEmailVerification(user.user);
-        console.log(user);
+        await sendEmailVerification(user.user, {
+          url:
+            process.env.NEXT_PUBLIC_NEXTAUTH_URL +
+            `?email=${encodeURIComponent(
+              values.email
+            )}&name=${encodeURIComponent(values.name)}`,
+          handleCodeInApp: false,
+        });
       }
     } catch (error: any) {
       setError("Something went wrong. Please try again later.");
@@ -200,8 +206,11 @@ export function RegisterStep2({
 
   async function onSubmit(values: z.infer<typeof registerStep2Schema>) {
     try {
-      const email = data.email;
-      if (email) {
+      const queryParams = new URLSearchParams(window.location.search);
+      const email = queryParams.get("email");
+      const name = queryParams.get("name");
+
+      if (email && name) {
         const user = await signInWithEmailAndPassword(auth, email, email);
         if (!user.user.emailVerified) {
           setError("Email not verified. Please verify your email.");
@@ -231,11 +240,7 @@ export function RegisterStep2({
         }
       }
     } catch (error: any) {
-      if (error.response.data.error) {
-        setError(error.response.data.error);
-      } else {
-        setError("Something went wrong. Please try again later.");
-      }
+      setError("Something went wrong. Please try again later.");
     }
   }
 
