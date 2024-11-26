@@ -248,11 +248,11 @@ export function RegisterStep2({
       //     setError("Verify your email please");
       // }
     } catch (error: any) {
-      if (error.response.data.error) {
-        setError(error.response.data.error);
-      } else {
-        setError("Something went wrong. Please try again later.");
-      }
+      // if (error.response.data.error) {
+      // setError(error.response.data.error);
+      // } else {
+      setError("Something went wrong. Please try again later.");
+      // }
     }
   }
 
