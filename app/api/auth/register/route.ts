@@ -3,6 +3,7 @@ import { hash } from "bcrypt";
 import nodemailer from "nodemailer";
 
 import prisma from "@/lib/prismadb";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 export async function POST(req: Request) {
   try {
@@ -25,26 +26,26 @@ export async function POST(req: Request) {
         );
       }
 
-      const transporter = nodemailer.createTransport({
-        host: process.env.SMTP_SERVER, // For Gmail SMTP server
-        port: 587, // For secure connection
-        secure: false, // Use TLS
-        auth: {
-          user: process.env.SMTP_USER, // Your email address
-          pass: process.env.SMTP_PASS, // Your email password or app-specific password
-        },
-      });
+      // const transporter = nodemailer.createTransport({
+      //   host: process.env.SMTP_SERVER, // For Gmail SMTP server
+      //   port: 587, // For secure connection
+      //   secure: false, // Use TLS
+      //   auth: {
+      //     user: process.env.SMTP_USER, // Your email address
+      //     pass: process.env.SMTP_PASS, // Your email password or app-specific password
+      //   },
+      // });
 
-      // Send email
-      const info = await transporter.sendMail({
-        from: "phoenixfeather0208@gmail.com", // Sender address
-        to: email, // Recipient address
-        subject: "Verify your email.", // Subject line
-        text: "Verify email", // Plain text body
-        html: `<a href="${process.env.NEXTAUTH_URL}/api/auth/verify/${email}">${process.env.NEXTAUTH_URL}/api/auth/verify/${email}</a>`, // HTML body
-      });
+      // // Send email
+      // const info = await transporter.sendMail({
+      //   from: "phoenixfeather0208@gmail.com", // Sender address
+      //   to: email, // Recipient address
+      //   subject: "Verify your email.", // Subject line
+      //   text: "Verify email", // Plain text body
+      //   html: `<a href="${process.env.NEXTAUTH_URL}/api/auth/verify/${email}">${process.env.NEXTAUTH_URL}/api/auth/verify/${email}</a>`, // HTML body
+      // });
 
-      console.log(info.messageId);
+      // console.log(info.messageId);
       return NextResponse.json({ success: true });
     } else if (step === "2") {
       const { email, username, name, password } = await req.json();

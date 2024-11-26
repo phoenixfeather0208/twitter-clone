@@ -25,6 +25,12 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import axios from "axios";
 import { signIn } from "next-auth/react";
+import {
+  isSignInWithEmailLink,
+  sendSignInLinkToEmail,
+  signInWithEmailLink,
+} from "firebase/auth";
+import { auth } from "@/firebaseConfig";
 
 interface RegisterType {
   registerStep: number;
@@ -109,8 +115,13 @@ function RegisterStep1({
       if (data.success) {
         setData(values);
         setStep(2);
-        localStorage.setItem("email", values.email);
-        localStorage.setItem("name", values.name);
+        sendSignInLinkToEmail(auth, values.email, {
+          url: process.env.NEXTAUTH_URL as string,
+          handleCodeInApp: true,
+        });
+        localStorage.setItem("emailForSignIn", values.email);
+        // localStorage.setItem("email", values.email);
+        // localStorage.setItem("name", values.name);
       }
     } catch (error: any) {
       if (error.response.data.error) {
@@ -189,47 +200,53 @@ export function RegisterStep2({
 
   async function onSubmit(values: z.infer<typeof registerStep2Schema>) {
     try {
-      const email = localStorage.getItem("email");
-      const verify = decodeURIComponent(getCookieValue("verify") as string);
-      if (email && verify) {
-        const res: any = await axios.post(`/api/auth/verify/${email}`, {
+      const email = localStorage.getItem("emailForSignIn");
+      // const verify = decodeURIComponent(getCookieValue("verify") as string);
+      if (email) {
+        // const res: any = await axios.post(`/api/auth/verify/${email}`, {
+        //   email,
+        //   verify,
+        // });
+
+        // if (!res.data.isMatch) {
+        //   setError("Verify your email please.");
+        // } else {
+        //   const { data: response, status } = await axios.post(
+        //     "/api/auth/register?step=2",
+        //     {
+        //       ...data,
+        //       ...values,
+        //     }
+        //   );
+        const result = await signInWithEmailLink(
+          auth,
           email,
-          verify,
-        });
+          window.location.href
+        );
+        console.log("Successfully signed in:", result.user);
+        window.localStorage.removeItem("emailForSignIn");
+        // if (status === 200) {
+        //   signIn("credentials", {
+        //     email: data.email,
+        //     password: values.password,
+        //   });
 
-        if (!res.data.isMatch) {
-          setError("Verify your email please.");
-        } else {
-          const { data: response, status } = await axios.post(
-            "/api/auth/register?step=2",
-            {
-              ...data,
-              ...values,
-            }
-          );
+        //   axios.post("/api/auth/sendmail", {
+        //     to: data.email,
+        //     subject: "Opinyx.com",
+        //     text: "Thanks for your registration to Opinyx.com",
+        //     html: `<p>Registration is done successfully.</p>`,
+        //   });
 
-          if (status === 200) {
-            signIn("credentials", {
-              email: data.email,
-              password: values.password,
-            });
+        //   localStorage.removeItem("name");
+        //   localStorage.removeItem("email");
 
-            axios.post("/api/auth/sendmail", {
-              to: data.email,
-              subject: "Opinyx.com",
-              text: "Thanks for your registration to Opinyx.com",
-              html: `<p>Registration is done successfully.</p>`,
-            });
-
-            localStorage.removeItem("name");
-            localStorage.removeItem("email");
-
-            registerModal.onClose();
-          }
-        }
-      } else {
-        setError("Verify your email please");
+        //   registerModal.onClose();
+        // }
       }
+      //   } else {
+      //     setError("Verify your email please");
+      // }
     } catch (error: any) {
       if (error.response.data.error) {
         setError(error.response.data.error);
