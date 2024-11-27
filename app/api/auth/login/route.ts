@@ -1,6 +1,10 @@
 import { compare } from "bcrypt";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prismadb";
+import {
+  sendEmailVerification,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 
 export async function POST(req: Request) {
   try {
@@ -15,6 +19,13 @@ export async function POST(req: Request) {
     if (!isExistingUser) {
       return NextResponse.json(
         { error: "Email does not exist" },
+        { status: 400 }
+      );
+    }
+
+    if (!isExistingUser.verified) {
+      return NextResponse.json(
+        { error: "Verify your email." },
         { status: 400 }
       );
     }

@@ -42,7 +42,12 @@ interface RegisterType {
 
 const RegisterModal = (props: RegisterType) => {
   const [step, setStep] = useState(1);
-  const [data, setData] = useState({ name: "", email: "" });
+  const [data, setData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    username: "",
+  });
 
   useEffect(() => {
     setStep(props.registerStep);
@@ -55,8 +60,10 @@ const RegisterModal = (props: RegisterType) => {
   const bodyContent =
     step === 1 ? (
       <RegisterStep1 setData={setData} setStep={setStep} />
+    ) : step == 2 ? (
+      <RegisterStep2 data={data} setData={setData} setStep={setStep} />
     ) : (
-      <RegisterStep2 data={data} />
+      <RegisterStep3 />
     );
 
   const onToggle = useCallback(() => {
@@ -97,7 +104,14 @@ function RegisterStep1({
   setData,
   setStep,
 }: {
-  setData: Dispatch<SetStateAction<{ name: string; email: string }>>;
+  setData: Dispatch<
+    SetStateAction<{
+      name: string;
+      email: string;
+      password: string;
+      username: string;
+    }>
+  >;
   setStep: Dispatch<SetStateAction<number>>;
 }) {
   const [error, setError] = useState("");
@@ -116,25 +130,15 @@ function RegisterStep1({
       const { data } = await axios.post("/api/auth/register?step=1", values);
 
       if (data.success) {
-        setData(values);
+        setData({ ...values, password: "", username: "" });
         setStep(2);
-        const user = await createUserWithEmailAndPassword(
-          auth,
-          values.email,
-          values.email
-        );
-
-        await sendEmailVerification(user.user, {
-          url:
-            process.env.NEXT_PUBLIC_NEXTAUTH_URL +
-            `?email=${encodeURIComponent(
-              values.email
-            )}&name=${encodeURIComponent(values.name)}`,
-          handleCodeInApp: false,
-        });
       }
     } catch (error: any) {
-      setError("Something went wrong. Please try again later.");
+      if (error.response.data.error) {
+        setError(error.response.data.error);
+      } else {
+        setError("Something went wrong. Please try again later.");
+      }
     }
   }
 
@@ -184,8 +188,19 @@ function RegisterStep1({
 
 export function RegisterStep2({
   data,
+  setData,
+  setStep,
 }: {
   data: { name: string; email: string };
+  setData: Dispatch<
+    SetStateAction<{
+      name: string;
+      email: string;
+      password: string;
+      username: string;
+    }>
+  >;
+  setStep: Dispatch<SetStateAction<number>>;
 }) {
   const [error, setError] = useState("");
   const registerModal = useRegisterModal();
@@ -206,42 +221,90 @@ export function RegisterStep2({
 
   async function onSubmit(values: z.infer<typeof registerStep2Schema>) {
     try {
-      const queryParams = new URLSearchParams(window.location.search);
-      const email = queryParams.get("email");
-      const name = queryParams.get("name");
+      const isSocial = localStorage.getItem("login") == "social";
+      if (values.password == values.password_confirm) {
+        if (!isSocial) {
+          await createUserWithEmailAndPassword(auth, data.email, data.email);
 
-      if (email && name) {
-        const user = await signInWithEmailAndPassword(auth, email, email);
-        if (!user.user.emailVerified) {
-          setError("Email not verified. Please verify your email.");
-          await sendEmailVerification(user.user);
+          const userCredential = await signInWithEmailAndPassword(
+            auth,
+            data.email,
+            data.email
+          );
+          const { data: response, status } = await axios.post(
+            "/api/auth/register?step=2",
+            {
+              ...data,
+              ...values,
+              verified: userCredential.user.emailVerified,
+            }
+          );
+
+          if (!userCredential.user.emailVerified) {
+            await sendEmailVerification(userCredential.user, {
+              url:
+                process.env.NEXT_PUBLIC_NEXTAUTH_URL +
+                `/api/auth/verify/${data.email}`,
+              handleCodeInApp: false,
+            });
+
+            setStep(3);
+            setData({
+              name: data.name,
+              email: data.email,
+              password: values.password,
+              username: values.username,
+            });
+
+            axios.post("/api/auth/sendmail", {
+              to: data.email,
+              subject: "Opinyx.com",
+              text: "Thanks for your registration to Opinyx.com",
+              html: `<p>Registration is done successfully.</p>
+              <p>Please verify your email to sign up.</p>`,
+            });
+          }
         } else {
           const { data: response, status } = await axios.post(
             "/api/auth/register?step=2",
             {
-              email,
-              name,
+              ...data,
               ...values,
+              verified: true,
             }
           );
-
           signIn("credentials", {
-            email: email,
+            email: data.email,
             password: values.password,
           });
-
           axios.post("/api/auth/sendmail", {
-            to: email,
+            to: data.email,
             subject: "Opinyx.com",
             text: "Thanks for your registration to Opinyx.com",
             html: `<p>Registration is done successfully.</p>`,
           });
-
-          registerModal.onClose();
         }
+      } else {
+        setError("Password is not matched");
       }
+      // if (!user.user.emailVerified) {
+      //   setError("Email not verified. Please verify your email.");
+      //   await sendEmailVerification(user.user);
+      // } else {
+
+      // signIn("credentials", {
+      //   email: data.email,
+      //   password: values.password,
+      // });
+
+      // registerModal.onClose();
+      // }
     } catch (error: any) {
-      setError("Something went wrong. Please try again later.");
+      if (error.response.data.error) {
+        setError(error.response.data.error);
+      } else {
+        setError("Something went wrong. Please try again later.");
+      }
     }
   }
 
@@ -280,6 +343,22 @@ export function RegisterStep2({
             </FormItem>
           )}
         />
+        <FormField
+          control={form.control}
+          name="password_confirm"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <Input
+                  placeholder="Confirm Password"
+                  type="password"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <Button
           type="submit"
@@ -292,4 +371,10 @@ export function RegisterStep2({
       </form>
     </Form>
   );
+}
+
+export function RegisterStep3() {
+  const registerModal = useRegisterModal();
+
+  return <div>Check your inbox to verify email.</div>;
 }

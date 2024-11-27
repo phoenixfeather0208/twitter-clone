@@ -25,30 +25,9 @@ export async function POST(req: Request) {
           { status: 400 }
         );
       }
-
-      // const transporter = nodemailer.createTransport({
-      //   host: process.env.SMTP_SERVER, // For Gmail SMTP server
-      //   port: 587, // For secure connection
-      //   secure: false, // Use TLS
-      //   auth: {
-      //     user: process.env.SMTP_USER, // Your email address
-      //     pass: process.env.SMTP_PASS, // Your email password or app-specific password
-      //   },
-      // });
-
-      // // Send email
-      // const info = await transporter.sendMail({
-      //   from: "phoenixfeather0208@gmail.com", // Sender address
-      //   to: email, // Recipient address
-      //   subject: "Verify your email.", // Subject line
-      //   text: "Verify email", // Plain text body
-      //   html: `<a href="${process.env.NEXTAUTH_URL}/api/auth/verify/${email}">${process.env.NEXTAUTH_URL}/api/auth/verify/${email}</a>`, // HTML body
-      // });
-
-      // console.log(info.messageId);
       return NextResponse.json({ success: true });
     } else if (step === "2") {
-      const { email, username, name, password } = await req.json();
+      const { email, username, name, password, verified } = await req.json();
 
       const isExistingUsername = await prisma.user.findUnique({
         where: { username },
@@ -69,6 +48,7 @@ export async function POST(req: Request) {
           username,
           name,
           password: hashedpassword,
+          verified,
         },
       });
 

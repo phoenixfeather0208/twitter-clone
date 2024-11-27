@@ -24,6 +24,11 @@ import axios from "axios";
 import { signIn } from "next-auth/react";
 import useRegisterModal from "@/components/modal/hooks/useRegisterModal";
 import { motion } from "framer-motion";
+import {
+  getAuth,
+  sendEmailVerification,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 
 const LoginModal = () => {
   const loginModal = useLoginModal();
@@ -51,12 +56,26 @@ const LoginModal = () => {
       if (data.success) {
         signIn("credentials", values);
         loginModal.onClose();
-        localStorage.removeItem("email");
-        localStorage.removeItem("name");
       }
     } catch (error: any) {
       if (error.response.data.error) {
         setError(error.response.data.error);
+        if (error.response.data.error == "Verify your email.") {
+          const auth = getAuth();
+          const userCredential = await signInWithEmailAndPassword(
+            auth,
+            values.email,
+            values.email
+          );
+
+          await sendEmailVerification(userCredential.user, {
+            url:
+              process.env.NEXT_PUBLIC_NEXTAUTH_URL +
+              `/api/auth/verify/${values.email}`,
+            handleCodeInApp: false,
+          });
+          sendEmailVerification(userCredential.user);
+        }
       } else {
         setError("Something went wrong. Please try again later.");
       }

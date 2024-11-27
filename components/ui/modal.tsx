@@ -36,6 +36,10 @@ const Modal = ({
   totalSteps,
   isEditing,
 }: ModalProps) => {
+  const queryParams = new URLSearchParams(window.location.search);
+  const email = queryParams.get("email");
+  const name = queryParams.get("name");
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
@@ -51,7 +55,6 @@ const Modal = ({
           {step && totalSteps && (
             <div className="">
               Step {step} of {totalSteps}{" "}
-              {step == 2 && "(Check your inbox to verify email.)"}
             </div>
           )}
         </div>

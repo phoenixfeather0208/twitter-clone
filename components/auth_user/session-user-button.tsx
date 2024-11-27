@@ -35,7 +35,7 @@ const SessionUserButton = () => {
                 </div>
 
                 <EllipsisWrapper>
-                  <span className="text-light-gray text-sm">
+                  <span className="text-light-gray text-sm truncate w-32">
                     @{user?.username}
                   </span>
                 </EllipsisWrapper>
@@ -56,9 +56,12 @@ const SessionUserButton = () => {
               })
             }
           >
-            <span className="text-sm">
-              Log out {user?.username ? `@${user?.username}` : user?.name}
-            </span>
+            <EllipsisWrapper>
+              <span className="text-sm truncate w-40">
+                Log out <br />
+                {user?.username ? `@${user?.username}` : user?.name}
+              </span>
+            </EllipsisWrapper>
           </div>
         </PopoverContent>
       </Popover>

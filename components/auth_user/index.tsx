@@ -29,12 +29,9 @@ const Auth = () => {
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
     const email = queryParams.get("email");
-    const name = queryParams.get("name");
 
-    if (email && name) {
-      setRegisterStep(2);
-      setRegisterData({ name, email });
-      registerModal.onOpen();
+    if (email) {
+      loginModal.onOpen();
     }
   }, []);
 
@@ -88,6 +85,7 @@ const Auth = () => {
     if (data.success) {
       setRegisterStep(2);
       setRegisterData({ name: data.data.name, email: data.data.email });
+      localStorage.setItem("login", "social");
       registerModal.onOpen();
     } else {
       setError(true);

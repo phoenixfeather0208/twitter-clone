@@ -5,6 +5,7 @@ import { following } from "../profile/utils/following";
 import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import FollowButton from "../elements/follow-button/follow-button";
+import { EllipsisWrapper } from "../elements/ellipsis-wrapper";
 
 const Person = ({ person }: { person: IUser }) => {
   const { data: session }: any = useSession();
@@ -41,10 +42,16 @@ const Person = ({ person }: { person: IUser }) => {
           <div className="">
             <div className="flex  flex-row justify-between items-center">
               <div className="flex flex-col">
-                <span className="hover:underline font-semibold">{person?.name}</span>
-                <span className="text-sm text-light-gray">
-                  @{person?.username}
-                </span>
+                <EllipsisWrapper>
+                  <span className="hover:underline font-semibold truncate">
+                    {person?.name}
+                  </span>
+                </EllipsisWrapper>
+                <EllipsisWrapper>
+                  <span className="text-sm text-light-gray truncate">
+                    @{person?.username}
+                  </span>
+                </EllipsisWrapper>
               </div>
 
               <FollowButton
@@ -54,7 +61,6 @@ const Person = ({ person }: { person: IUser }) => {
               />
             </div>
           </div>
-           
         </div>
       </div>
     </>
