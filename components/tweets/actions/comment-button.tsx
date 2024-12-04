@@ -2,8 +2,10 @@ import { MessageCircleMore } from "lucide-react";
 import React from "react";
 import { ITweet } from "../types";
 import { CommentIcon } from "@/assets/comment-icon";
+import Link from "next/link";
 
 const CommentButton = ({ tweet }: { tweet: ITweet }) => {
+  console.log(tweet);
   return (
     <div className="flex flex-row items-center space-x-1 group">
       <span
@@ -14,7 +16,9 @@ const CommentButton = ({ tweet }: { tweet: ITweet }) => {
          
       `}
       >
-        <CommentIcon />
+        <Link href={"/posts/" + tweet.id}>
+          <CommentIcon />
+        </Link>
       </span>
 
       {tweet?._count?.comments > 0 && (

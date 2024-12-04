@@ -65,12 +65,11 @@ export async function GET(request: Request) {
         }),
       },
 
-       
       include: {
         likes: true,
         comments: true,
         media: true,
-        pinned_by_users:true,
+        pinned_by_users: true,
         Bookmarks: {
           include: {
             user: true,
@@ -115,23 +114,19 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const { tweet } = (await request.json()) as {
-    tweet: {
-      body: string;
-      userId: string;
-      in_reply_to_screen_name: string;
-      in_reply_to_tweet_id: string;
-    };
-  };
+  const { tweet } = await request.json();
+  console.log(tweet);
 
   try {
-    const created_tweet = await prisma.post.create({
-      data: {
-        ...tweet,
-      },
-    });
-
-    return NextResponse.json(created_tweet, { status: 200 });
+    if (!tweet?.target_id) {
+      const created_tweet = await prisma.post.create({
+        data: {
+          ...tweet,
+        },
+      });
+      return NextResponse.json(created_tweet, { status: 200 });
+    } else {
+    }
   } catch (error: any) {
     return NextResponse.json(
       {
@@ -147,33 +142,31 @@ export async function DELETE(request: Request) {
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("id") as string;
   const userId = searchParams.get("userId") as string;
-  const pinnedParam  = searchParams.get("pinned")
+  const pinnedParam = searchParams.get("pinned");
 
   const pinned: boolean = pinnedParam !== null ? pinnedParam === "true" : false;
 
   try {
-
-    if(pinned){
-     await prisma.user.update({
+    if (pinned) {
+      await prisma.user.update({
         where: {
-          id: userId, 
+          id: userId,
         },
         data: {
           pinned_tweet_id: null,
         },
-      })
+      });
     }
 
-     await prisma.post.delete({
+    await prisma.post.delete({
       where: {
         id,
       },
-    })
+    });
 
     return NextResponse.json({
       message: "Tweet deleted successfully",
     });
-    
   } catch (error: any) {
     console.error("Error deleting tweet:", error);
     return NextResponse.json(
@@ -181,10 +174,7 @@ export async function DELETE(request: Request) {
         message: "Something went wrong",
         error: error.message,
       },
-      { status: error.errorCode || 500 },
+      { status: error.errorCode || 500 }
     );
   }
-
-
 }
-
